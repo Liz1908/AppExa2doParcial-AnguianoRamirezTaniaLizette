@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalogo de Libros</title>
+    <style>
+    body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh; /* Esto garantiza que el cuerpo ocupe al menos el 100% de la altura visible del navegador */
+        margin: 0;
+    }
+        /* Agrega un estilo para el texto en negrita */
+        #tablaContainer {
+            margin: 20px auto; /* Centra el contenedor en la página */
+            max-width: 800px; /* Establece un ancho máximo para mejorar la proporción */
+            /*flex: 1; /* Esto hace que el contenido principal (tablaContainer) ocupe todo el espacio disponible */
+        }
+
+        #tablaDatos {
+            width: 100%; /* Hace que la tabla ocupe el 100% del ancho del contenedor */
+            border-collapse: collapse; /* Combina los bordes de las celdas para una apariencia más limpia */
+            margin-top: 10px; /* Agrega un espacio superior para separar del campo de búsqueda */
+        }
+
+        #tablaDatos th, #tablaDatos td {
+            padding: 8px; /* Añade espacio interno a las celdas para una apariencia más limpia */
+            border: 1px solid #ddd; /* Agrega bordes a las celdas para una apariencia más estructurada */
+            text-align: left; /* Alinea el texto a la izquierda */
+        }
+
+        #tablaDatos tbody strong {
+            font-weight: bold;
+        }
+
+        #tituloPrincipal {
+            text-align: center; /* Centra el texto en el contenedor */
+            color: #333; /* Color del texto */
+        }
+
+        #tituloBusqueda {
+            text-align: center; /* Centra el texto en el contenedor */
+            color: #666; /* Color del texto */
+        }
+        footer {
+        text-align: center;
+        padding: 10px;
+        background-color: #f4f4f4; /* Añade un color de fondo al footer para mayor claridad */
+    }
+    </style>
+</head>
+<body>
+    <div id="tablaContainer">
+        <h1 id="tituloPrincipal">Libreria Siglo XXI</h1>
+        <h2 id="tituloBusqueda">Listado de libros</h2>
+
+
+        <!-- Campo de búsqueda -->
+        <label for="campoBusqueda">Buscar por Título:</label>
+        <input type="text" id="campoBusqueda">
+        <button onclick="buscarPorTitulo()">Buscar</button>
+        <button onclick="mostrarTodosLibros()">Mostrar Todos</button>
+
+        <table id="tablaDatos">
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th>Autor</th>
+                    <th>Capítulos</th>
+                    <th>Páginas</th>
+                    <th>Precio</th>                
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+<script>
+    function buscarPorTitulo() {
+        const tituloBusqueda = document.getElementById('campoBusqueda').value;
+        limpiarTabla();
+        // Hacer la solicitud fetch y manipular la respuesta
+        fetch(`http://localhost:5018/api/libro/tituloBusqueda?tituloBusqueda=${encodeURIComponent(tituloBusqueda)}`)
+            .then(response => response.json())
+            .then(data => {
+                agregarFilasTabla(data);
+            })
+            .catch(error => mostrarError('Error al obtener datos:', error));
+    }
+
+    function mostrarTodosLibros() {
+        limpiarTabla();
+        // Hacer la solicitud fetch y manipular la respuesta
+        fetch('http://localhost:5018/api/LibrosConAutores/todos')
+            .then(response => response.json())
+            .then(data => {
+                agregarFilasTabla(data);
+            })
+            .catch(error => mostrarError('Error al obtener datos:', error));
+    }
+
+    function limpiarTabla() {
+        const tabla = document.getElementById('tablaDatos').getElementsByTagName('tbody')[0];
+        tabla.innerHTML = '';
+    }
+
+    function agregarFilasTabla(data) {
+        const tabla = document.getElementById('tablaDatos').getElementsByTagName('tbody')[0];
+        data.forEach(Libro => {
+            const fila = tabla.insertRow();
+            const celdaTitulo = fila.insertCell(0);
+            const celdaAutor = fila.insertCell(1);
+            const celdaCapitulos = fila.insertCell(2);
+            const celdaPaginas = fila.insertCell(3);
+            const celdaPrecio = fila.insertCell(4);
+
+            // Utilizar la etiqueta <strong> para poner el texto en negrita
+            celdaTitulo.innerHTML = `<strong>${Libro.tituloLibro}</strong>`;
+            celdaAutor.innerHTML = `<strong>${Libro.nombreAutor}</strong>`;
+            celdaCapitulos.innerHTML = `<strong>${Libro.capitulosLibro}</strong>`;
+            celdaPaginas.innerHTML = `<strong>${Libro.paginasLibro}</strong>`;
+            celdaPrecio.innerHTML = `<strong>${Libro.precioLibro}</strong>`;
+        });
+    }
+
+    function mostrarError(mensaje, error) {
+        console.error(mensaje, error);
+    }
+</script>
+<footer>
+    <p>© 2023 Librería Siglo XXI. Elaborado por TANIA LIZETTE ANGUIANO RAMIREZ DESARROLLO DE APLICACIONES EMPRESARIALES GRUPO 12:15PM A 13:55PM.</p>
+</footer>
+
+</body>
+</html>
